@@ -1,0 +1,6 @@
+{
+  "name": "CtrlFinance (Flutter)",
+  "description": "App Flutter gerador de APK para controle financeiro, focado em dívidas e sync local.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
