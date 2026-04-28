@@ -22,19 +22,16 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
           cache: true
-      - name: Initialize Android Project
+      - name: Recreate Android Project and Build
         run: |
-          cd flutter_app
-          mv lib lib_bak
-          flutter create --platforms android .
-          rm -rf lib
-          mv lib_bak lib
-      - name: Install dependencies
-        run: cd flutter_app && flutter pub get
-      - name: Build APK
-        run: cd flutter_app && flutter build apk --release
+          flutter create -t app --org com.ctrlfinance --project-name ctrl_finance_app new_flutter_app
+          cp -R flutter_app/lib/* new_flutter_app/lib/
+          cp flutter_app/pubspec.yaml new_flutter_app/pubspec.yaml
+          cd new_flutter_app
+          flutter pub get
+          flutter build apk --release
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: CtrlFinance-Release-APK
-          path: flutter_app/build/app/outputs/flutter-apk/app-release.apk
+          path: new_flutter_app/build/app/outputs/flutter-apk/app-release.apk
