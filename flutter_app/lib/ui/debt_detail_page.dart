@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../core/finance_provider.dart';
+import '../core/finance_models.dart';
 import '../core/debt_models.dart';
 
 class DebtDetailPage extends StatefulWidget {
@@ -328,12 +329,14 @@ class _DebtDetailPageState extends State<DebtDetailPage> {
                 provider.updateAdvancedDebt(debt.id, debt);
 
                 // Add to transactions history
-                provider.addTransaction(FinanceTransaction(
+                provider.addTransaction(AppFinanceTransaction(
                   id: DateTime.now().toString(),
-                  title: 'Pagamento: \${debt.name}',
+                  title: 'Pagamento: ${debt.name}',
                   amount: paidAmount,
-                  date: DateTime.now(),
-                  isExpense: true
+                  releaseDate: DateTime.now(),
+                  dueDate: DateTime.now(),
+                  effectiveDate: DateTime.now(),
+                  type: TransactionType.expense,
                 ));
 
                 // Check if all are paid

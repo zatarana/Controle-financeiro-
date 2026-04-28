@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../core/finance_provider.dart';
+import '../core/finance_models.dart';
 import 'package:intl/intl.dart';
 import 'advanced_debts_tab.dart'; // Módulo de dívidas
 import 'tasks_overview_tab.dart'; // Módulo de tarefas
+import 'accounts_tab.dart';
+import 'categories_tab.dart';
+import 'credit_cards_tab.dart';
+import 'transaction_form_page.dart';
+import 'reports_tab.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,6 +32,41 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.black),
+              child: Text('Minhas Finanças\nMenu Principal', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_balance),
+              title: const Text('Contas'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const AccountsPage()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.category),
+              title: const Text('Categorias'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const CategoriesPage()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.credit_card),
+              title: const Text('Cartões de Crédito'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const CreditCardsPage()));
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         title: const Text('FinançaPro'),
         actions: [
@@ -90,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                 subtitle: const Text('Adicionar receita ou despesa', style: TextStyle(fontSize: 12, color: Colors.black54)),
                 onTap: () {
                   Navigator.pop(ctx);
-                  _showTransactionForm(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const TransactionFormPage()));
                 },
               ),
               const Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Divider(color: Color(0xFFF3F4F6), height: 1)),
@@ -111,122 +152,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         );
-    });
-  }
-
-  void _showTransactionForm(BuildContext context) {
-    final titleCtrl = TextEditingController();
-    final amountCtrl = TextEditingController();
-    bool isExpense = true;
-    
-    showModalBottomSheet(
-      isScrollControlled: true,
-      context: context, 
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setState) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 24, right: 24, top: 24
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text('Lançar Transação', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: -0.5)),
-              const SizedBox(height: 24),
-              TextField(
-                controller: titleCtrl, 
-                decoration: InputDecoration(
-                  labelText: 'Descrição',
-                  labelStyle: const TextStyle(color: Colors.black54),
-                  filled: true,
-                  fillColor: const Color(0xFFF9FAFB),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black)),
-                )
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: amountCtrl, 
-                keyboardType: const TextInputType.numberWithOptions(decimal: true), 
-                decoration: InputDecoration(
-                  labelText: 'Valor (R\$)',
-                  labelStyle: const TextStyle(color: Colors.black54),
-                  filled: true,
-                  fillColor: const Color(0xFFF9FAFB),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black)),
-                )
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => isExpense = true),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: isExpense ? const Color(0xFFFEF2F2) : const Color(0xFFF9FAFB),
-                          border: Border.all(color: isExpense ? Colors.red : Colors.transparent),
-                          borderRadius: BorderRadius.circular(12)
-                        ),
-                        alignment: Alignment.center,
-                        child: Text('Despesa', style: TextStyle(color: isExpense ? Colors.red : Colors.black54, fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => isExpense = false),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: !isExpense ? const Color(0xFFF0FDF4) : const Color(0xFFF9FAFB),
-                          border: Border.all(color: !isExpense ? Colors.green : Colors.transparent),
-                          borderRadius: BorderRadius.circular(12)
-                        ),
-                        alignment: Alignment.center,
-                        child: Text('Receita', style: TextStyle(color: !isExpense ? Colors.green : Colors.black54, fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
-                onPressed: () {
-                  if (titleCtrl.text.isNotEmpty && amountCtrl.text.isNotEmpty) {
-                    final provider = context.read<FinanceProvider>();
-                    provider.addTransaction(FinanceTransaction(
-                      id: DateTime.now().toString(),
-                      title: titleCtrl.text,
-                      amount: double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? 0,
-                      date: DateTime.now(),
-                      isExpense: isExpense
-                    ));
-                    Navigator.pop(ctx);
-                  }
-                },
-                child: const Text('Salvar Transação', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
-      )
+      }
     );
   }
 
@@ -414,6 +340,9 @@ class DashboardTab extends StatelessWidget {
                 itemCount: provider.transactions.length > 5 ? 5 : provider.transactions.length,
                 itemBuilder: (context, index) {
                   final t = provider.transactions.reversed.toList()[index];
+                  bool isExpense = t.type == TransactionType.expense || t.type == TransactionType.creditCardExpense;
+                  bool isTransfer = t.type == TransactionType.transfer;
+                  
                   return Card(
                     margin: const EdgeInsets.only(bottom: 12),
                     child: ListTile(
@@ -421,17 +350,21 @@ class DashboardTab extends StatelessWidget {
                       leading: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: t.isExpense ? const Color(0xFFFEF2F2) : const Color(0xFFF0FDF4),
+                          color: isTransfer ? const Color(0xFFF3F4F6) : (isExpense ? const Color(0xFFFEF2F2) : const Color(0xFFF0FDF4)),
                           borderRadius: BorderRadius.circular(12)
                         ),
-                        child: Icon(t.isExpense ? Icons.shopping_bag_outlined : Icons.account_balance_wallet_outlined, color: t.isExpense ? Colors.red : Colors.green, size: 20),
+                        child: Icon(isTransfer ? Icons.swap_horiz : (isExpense ? Icons.shopping_bag_outlined : Icons.account_balance_wallet_outlined), color: isTransfer ? Colors.black54 : (isExpense ? Colors.red : Colors.green), size: 20),
                       ),
                       title: Text(t.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-                      subtitle: Text(DateFormat('dd MMM, yyyy').format(t.date), style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                      subtitle: Text('\${DateFormat('dd MMM, yyyy').format(t.dueDate)}\${!t.isPaid ? ' (Pendente)' : ''}', style: TextStyle(fontSize: 12, color: t.isPaid ? Colors.black54 : Colors.orange, fontWeight: t.isPaid ? FontWeight.normal : FontWeight.bold)),
                       trailing: Text(
-                        '\${t.isExpense ? "-" : "+"} \${currencyFormat.format(t.amount)}',
-                        style: TextStyle(color: t.isExpense ? Colors.black87 : Colors.green, fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: -0.5),
+                        isTransfer ? currencyFormat.format(t.amount) : '\${isExpense ? "-" : "+"} \${currencyFormat.format(t.amount)}',
+                        style: TextStyle(color: isTransfer ? Colors.black87 : (isExpense ? Colors.black87 : Colors.green), fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: -0.5),
                       ),
+                      onTap: () {
+                        // Allow edit
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionFormPage(transaction: t, initialType: t.type)));
+                      },
                     ),
                   );
                 },
@@ -521,123 +454,4 @@ class DebtsLoansTab extends StatelessWidget {
   }
 }
 
-class ReportsTab extends StatelessWidget {
-  const ReportsTab({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final provider = context.watch<FinanceProvider>();
-    final currencyFormat = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
-    
-    double expenses = provider.transactions.where((t) => t.isExpense).fold(0, (sum, t) => sum + t.amount);
-    double income = provider.transactions.where((t) => !t.isExpense).fold(0, (sum, t) => sum + t.amount);
-    double total = expenses + income;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text('Resumo Financeiro', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: -0.5)),
-          const SizedBox(height: 8),
-          const Text('Auditoria visual dos seus ganhos e gastos', style: TextStyle(color: Colors.black54, fontSize: 13)),
-          const SizedBox(height: 32),
-          
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFF3F4F6))
-            ),
-            child: total == 0 
-              ? const SizedBox(
-                  height: 200,
-                  child: Center(child: Text('Insira transações para ver o gráfico.', style: TextStyle(color: Colors.black45, fontWeight: FontWeight.w500)))
-                )
-              : Column(
-                  children: [
-                    SizedBox(
-                      height: 220,
-                      child: PieChart(
-                        PieChartData(
-                          sectionsSpace: 2,
-                          centerSpaceRadius: 70,
-                          startDegreeOffset: 270,
-                          sections: [
-                            if (expenses > 0)
-                              PieChartSectionData(color: Colors.black, value: expenses, title: '\${((expenses/total)*100).toStringAsFixed(0)}%', radius: 24, titleStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 10)),
-                            if (income > 0)
-                              PieChartSectionData(color: const Color(0xFFE5E7EB), value: income, title: '\${((income/total)*100).toStringAsFixed(0)}%', radius: 24, titleStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 10)),
-                          ]
-                        )
-                      )
-                    ),
-                    const SizedBox(height: 32),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildLegendItem(Colors.black, 'Despesas', expenses, currencyFormat),
-                        Container(width: 1, height: 40, color: const Color(0xFFF3F4F6)),
-                        _buildLegendItem(const Color(0xFFE5E7EB), 'Receitas', income, currencyFormat),
-                      ],
-                    )
-                  ],
-                ),
-          ),
-          
-          const SizedBox(height: 24),
-          const Text('Dívidas vs Empréstimos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: -0.5)),
-          const SizedBox(height: 16),
-          
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFF3F4F6))
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Dívidas Restantes', style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 4),
-                    Text(currencyFormat.format(provider.totalUnpaidDebts), style: const TextStyle(color: Colors.red, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: -0.5)),
-                  ],
-                ),
-                Container(width: 1, height: 40, color: const Color(0xFFF3F4F6)),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Text('Empréstimos Rest.', style: TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 4),
-                    Text(currencyFormat.format(provider.totalUnpaidLoans), style: const TextStyle(color: Colors.blue, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: -0.5)),
-                  ],
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLegendItem(Color color, String label, double amount, NumberFormat format) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-            const SizedBox(width: 8),
-            Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.w600)),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(format.format(amount), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: -0.5)),
-      ],
-    );
-  }
-}

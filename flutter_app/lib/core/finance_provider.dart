@@ -1,59 +1,29 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'debt_models.dart'; // import novo modulo de dividas
-
-// Modelos do Aplicativo
-class FinanceTransaction {
-  final String id;
-  final String title;
-  final double amount;
-  final DateTime date;
-  final bool isExpense;
-
-  FinanceTransaction({required this.id, required this.title, required this.amount, required this.date, required this.isExpense});
-
-  Map<String, dynamic> toJson() => {
-    'id': id, 'title': title, 'amount': amount, 'date': date.toIso8601String(), 'isExpense': isExpense
-  };
-
-  factory FinanceTransaction.fromJson(Map<String, dynamic> json) => FinanceTransaction(
-    id: json['id'], title: json['title'], amount: json['amount'], date: DateTime.parse(json['date']), isExpense: json['isExpense']
-  );
-}
-
-class DebtLoan {
-  final String id;
-  final String title;
-  final double amount;
-  final DateTime date;
-  final bool isDebt;
-  bool isPaid;
-
-  DebtLoan({required this.id, required this.title, required this.amount, required this.date, required this.isDebt, this.isPaid = false});
-
-  Map<String, dynamic> toJson() => {
-    'id': id, 'title': title, 'amount': amount, 'date': date.toIso8601String(), 'isDebt': isDebt, 'isPaid': isPaid
-  };
-
-  factory DebtLoan.fromJson(Map<String, dynamic> json) => DebtLoan(
-    id: json['id'], title: json['title'], amount: json['amount'], date: DateTime.parse(json['date']), isDebt: json['isDebt'], isPaid: json['isPaid']
-  );
-}
+import 'debt_models.dart';
+import 'finance_models.dart';
 
 // Provider de Estado Global com SharedPreferences (Sincronização Local)
 class FinanceProvider extends ChangeNotifier {
-  List<FinanceTransaction> _transactions = [];
+  List<AppFinanceTransaction> _transactions = [];
   List<DebtLoan> _debtsLoans = [];
-  List<DebtItem> _advancedDebts = []; // Novo módulo especifico
+  List<DebtItem> _advancedDebts = [];
+  
+  List<FinanceAccount> _accounts = [];
+  List<FinanceCategory> _categories = [];
+  List<CreditCard> _creditCards = [];
 
-  List<FinanceTransaction> get transactions => _transactions;
+  List<AppFinanceTransaction> get transactions => _transactions;
   List<DebtLoan> get debtsLoans => _debtsLoans;
   List<DebtItem> get advancedDebts => _advancedDebts;
+  List<FinanceAccount> get accounts => _accounts;
+  List<FinanceCategory> get categories => _categories;
+  List<CreditCard> get creditCards => _creditCards;
 
   double get totalBalance {
-    double exp = _transactions.where((t) => t.isExpense).fold(0, (sum, t) => sum + t.amount);
-    double inc = _transactions.where((t) => !t.isExpense).fold(0, (sum, t) => sum + t.amount);
+    double exp = _transactions.where((t) => t.type == TransactionType.expense || t.type == TransactionType.creditCardExpense).fold(0, (sum, t) => sum + t.amount);
+    double inc = _transactions.where((t) => t.type == TransactionType.income).fold(0, (sum, t) => sum + t.amount);
     return inc - exp;
   }
 
@@ -63,13 +33,17 @@ class FinanceProvider extends ChangeNotifier {
   Future<void> loadData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final trStr = prefs.getString('transactions');
+      final trStr = prefs.getString('app_transactions');
       final dlStr = prefs.getString('debtsLoans');
       final adStr = prefs.getString('advancedDebts');
+      
+      final accStr = prefs.getString('app_accounts');
+      final catStr = prefs.getString('app_categories');
+      final ccStr = prefs.getString('app_credit_cards');
 
       if (trStr != null) {
         Iterable l = json.decode(trStr);
-        _transactions = List<FinanceTransaction>.from(l.map((model) => FinanceTransaction.fromJson(model)));
+        _transactions = List<AppFinanceTransaction>.from(l.map((model) => AppFinanceTransaction.fromJson(model)));
       }
       if (dlStr != null) {
         Iterable l = json.decode(dlStr);
@@ -79,24 +53,53 @@ class FinanceProvider extends ChangeNotifier {
         Iterable l = json.decode(adStr);
         _advancedDebts = List<DebtItem>.from(l.map((model) => DebtItem.fromJson(model)));
       }
+      
+      if (accStr != null) {
+        Iterable l = json.decode(accStr);
+        _accounts = List<FinanceAccount>.from(l.map((model) => FinanceAccount.fromJson(model)));
+      } else {
+        // Defaults
+        _accounts = [
+          FinanceAccount(id: '1', name: 'Conta Principal', initialBalance: 0, currentBalance: 0, colorHex: '#4CAF50')
+        ];
+      }
+      
+      if (catStr != null) {
+        Iterable l = json.decode(catStr);
+        _categories = List<FinanceCategory>.from(l.map((model) => FinanceCategory.fromJson(model)));
+      } else {
+        _categories = [
+          FinanceCategory(id: '1', name: 'Alimentação', type: CategoryType.expense, iconName: 'restaurant', colorHex: '#F44336'),
+          FinanceCategory(id: '2', name: 'Salário', type: CategoryType.income, iconName: 'attach_money', colorHex: '#4CAF50'),
+        ];
+      }
+      
+      if (ccStr != null) {
+        Iterable l = json.decode(ccStr);
+        _creditCards = List<CreditCard>.from(l.map((model) => CreditCard.fromJson(model)));
+      }
+
       notifyListeners();
     } catch (e) {
-      debugPrint('Erro ao carregar dados locais: \$e');
+      debugPrint('Erro ao carregar dados locais: $e');
     }
   }
 
   Future<void> saveData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('transactions', json.encode(_transactions.map((t) => t.toJson()).toList()));
+      await prefs.setString('app_transactions', json.encode(_transactions.map((t) => t.toJson()).toList()));
       await prefs.setString('debtsLoans', json.encode(_debtsLoans.map((d) => d.toJson()).toList()));
       await prefs.setString('advancedDebts', json.encode(_advancedDebts.map((d) => d.toJson()).toList()));
+      await prefs.setString('app_accounts', json.encode(_accounts.map((a) => a.toJson()).toList()));
+      await prefs.setString('app_categories', json.encode(_categories.map((c) => c.toJson()).toList()));
+      await prefs.setString('app_credit_cards', json.encode(_creditCards.map((c) => c.toJson()).toList()));
     } catch (e) {
-      debugPrint('Erro ao salvar dados locais: \$e');
+      debugPrint('Erro ao salvar dados locais: $e');
     }
   }
 
-  void addTransaction(FinanceTransaction transaction) {
+  void addTransaction(AppFinanceTransaction transaction) {
     _transactions.add(transaction);
     saveData();
     notifyListeners();
