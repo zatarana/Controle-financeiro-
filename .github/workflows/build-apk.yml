@@ -25,6 +25,7 @@ jobs:
       - name: Recreate Android Project and Build
         run: |
           flutter create -t app --org com.ctrlfinance --project-name ctrl_finance_app new_flutter_app
+          sed -i -E 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "1.9.24"/g' new_flutter_app/android/settings.gradle || true
           cp -R flutter_app/lib/* new_flutter_app/lib/
           cp flutter_app/pubspec.yaml new_flutter_app/pubspec.yaml
           cd new_flutter_app
