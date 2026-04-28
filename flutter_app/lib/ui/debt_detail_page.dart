@@ -44,7 +44,7 @@ class _DebtDetailPageState extends State<DebtDetailPage> {
             // Status and Start Payment Button
             if (debt.status == DebtStatus.pendente)
               Container(
-                margin: const EdgeInsets.bottom(24),
+                margin: const EdgeInsets.only(bottom: 24),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFFBEB),
@@ -216,7 +216,7 @@ class _DebtDetailPageState extends State<DebtDetailPage> {
                           children: [
                             Text(currencyFormat.format(inst.originalAmount), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, decoration: instStatus == InstallmentStatus.paga || instStatus == InstallmentStatus.antecipada ? TextDecoration.lineThrough : null)),
                             const SizedBox(height: 4),
-                            Text('Venc: \${DateFormat('dd/MM/yyyy').format(inst.dueDate)}', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                            Text('Venc: \${DateFormat("dd/MM/yyyy").format(inst.dueDate)}', style: const TextStyle(fontSize: 12, color: Colors.black54)),
                           ],
                         ),
                       ),
