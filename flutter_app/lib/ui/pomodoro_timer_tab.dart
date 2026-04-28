@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show FontFeature;
 import 'package:flutter/material.dart';
 
 class PomodoroTimerTab extends StatefulWidget {
@@ -9,7 +10,7 @@ class PomodoroTimerTab extends StatefulWidget {
 }
 
 class _PomodoroTimerTabState extends State<PomodoroTimerTab> {
-  int _focusMinutes = 25;
+  final int _focusMinutes = 25;
   int _secondsRemaining = 25 * 60;
   bool _isRunning = false;
   Timer? _timer;
@@ -25,12 +26,16 @@ class _PomodoroTimerTabState extends State<PomodoroTimerTab> {
       _timer?.cancel();
     } else {
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!mounted) {
+          timer.cancel();
+          return;
+        }
+
         if (_secondsRemaining > 0) {
           setState(() => _secondsRemaining--);
         } else {
           timer.cancel();
-          _isRunning = false;
-          // Play sound or notification here
+          setState(() => _isRunning = false);
         }
       });
     }
@@ -53,10 +58,10 @@ class _PomodoroTimerTabState extends State<PomodoroTimerTab> {
 
   @override
   Widget build(BuildContext context) {
-    int minutes = _secondsRemaining ~/ 60;
-    int seconds = _secondsRemaining % 60;
-    String minStr = minutes.toString().padLeft(2, '0');
-    String secStr = seconds.toString().padLeft(2, '0');
+    final minutes = _secondsRemaining ~/ 60;
+    final seconds = _secondsRemaining % 60;
+    final minStr = minutes.toString().padLeft(2, '0');
+    final secStr = seconds.toString().padLeft(2, '0');
 
     return Scaffold(
       appBar: AppBar(title: const Text('Foco (Pomodoro)')),
@@ -72,7 +77,11 @@ class _PomodoroTimerTabState extends State<PomodoroTimerTab> {
               ),
               child: Text(
                 '$minStr:$secStr',
-                style: const TextStyle(fontSize: 64, fontWeight: FontWeight.bold, fontFeatures: [FontFeature.tabularFigures()]),
+                style: const TextStyle(
+                  fontSize: 64,
+                  fontWeight: FontWeight.bold,
+                  fontFeatures: [FontFeature.tabularFigures()],
+                ),
               ),
             ),
             const SizedBox(height: 48),
