@@ -127,6 +127,9 @@ class FinanceProvider extends ChangeNotifier {
     final idx = _advancedDebts.indexWhere((element) => element.id == debtId);
     if (idx != -1 && (_advancedDebts[idx].status == DebtStatus.pendente || _advancedDebts[idx].status == DebtStatus.renegociada)) {
       _advancedDebts[idx].status = DebtStatus.emPagamento;
+      
+      // Criar transações de despesa caso o usuário marque "pagar", isso não deve ser feito no start Payment, 
+      // mas se o comportamento for integrar, a gente pode deixar o usuário pagar via debt detail
       saveData();
       notifyListeners();
     }

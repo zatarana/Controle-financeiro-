@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../core/task_provider.dart';
 import '../core/task_models.dart';
+import 'task_detail_page.dart';
+import 'eisenhower_matrix_tab.dart';
+import 'pomodoro_timer_tab.dart';
+import 'habit_tracker_tab.dart';
 
 class TasksOverviewTab extends StatefulWidget {
   const TasksOverviewTab({super.key});
@@ -26,15 +30,42 @@ class _TasksOverviewTabState extends State<TasksOverviewTab> with SingleTickerPr
       children: [
         Container(
           color: Colors.white,
-          child: TabBar(
-            controller: _tabController,
-            labelColor: Colors.black,
-            unselectedLabelColor: Colors.black54,
-            indicatorColor: Colors.black,
-            tabs: const [
-              Tab(text: 'Hoje'),
-              Tab(text: 'Inbox'),
-              Tab(text: 'Concluídas'),
+          child: Row(
+            children: [
+              Expanded(
+                child: TabBar(
+                  controller: _tabController,
+                  labelColor: Colors.black,
+                  unselectedLabelColor: Colors.black54,
+                  indicatorColor: Colors.black,
+                  tabs: const [
+                    Tab(text: 'Hoje'),
+                    Tab(text: 'Inbox'),
+                    Tab(text: 'Concluídas'),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.grid_view),
+                tooltip: 'Matriz de Eisenhower',
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const EisenhowerMatrixTab()));
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.timer_outlined),
+                tooltip: 'Foco (Pomodoro)',
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const PomodoroTimerTab()));
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.loop),
+                tooltip: 'Hábitos',
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const HabitTrackerTab()));
+                },
+              )
             ],
           ),
         ),
@@ -100,13 +131,18 @@ class _TasksOverviewTabState extends State<TasksOverviewTab> with SingleTickerPr
                             : null,
                       ),
                     ),
-                    title: Text(
-                      task.title,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                        decoration: isCompleted ? TextDecoration.lineThrough : null,
-                        color: isCompleted ? Colors.black38 : Colors.black87,
+                    title: GestureDetector(
+                      onTap: () {
+                         Navigator.push(context, MaterialPageRoute(builder: (_) => TaskDetailPage(taskId: task.id)));
+                      },
+                      child: Text(
+                        task.title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                          decoration: isCompleted ? TextDecoration.lineThrough : null,
+                          color: isCompleted ? Colors.black38 : Colors.black87,
+                        ),
                       ),
                     ),
                     subtitle: task.dueDate != null 

@@ -5,8 +5,10 @@ import 'task_models.dart';
 
 class TaskProvider extends ChangeNotifier {
   List<TaskItem> _tasks = [];
+  List<TaskList> _taskLists = [];
 
   List<TaskItem> get tasks => _tasks;
+  List<TaskList> get taskLists => _taskLists;
 
   List<TaskItem> get todayTasks {
     final now = DateTime.now();
@@ -19,17 +21,40 @@ class TaskProvider extends ChangeNotifier {
     }).toList();
   }
 
+  List<TaskItem> get next7DaysTasks {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final nextWeek = today.add(const Duration(days: 7));
+    return _tasks.where((t) {
+      if (t.status == TaskStatus.completed) return false;
+      if (t.dueDate == null) return false;
+      final due = DateTime(t.dueDate!.year, t.dueDate!.month, t.dueDate!.day);
+      return due.isAfter(today) && due.isBefore(nextWeek); 
+    }).toList();
+  }
+
   List<TaskItem> get inboxTasks {
-    return _tasks.where((t) => t.listName == 'Inbox' && t.status == TaskStatus.pending).toList();
+    return _tasks.where((t) => t.listId == 'inbox' && t.status == TaskStatus.pending).toList();
   }
   
   List<TaskItem> get completedTasks {
     return _tasks.where((t) => t.status == TaskStatus.completed).toList();
   }
 
+  List<TaskItem> tasksByList(String listId) {
+    return _tasks.where((t) => t.listId == listId && t.status != TaskStatus.completed).toList();
+  }
+
   Future<void> loadData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      
+      final tlStr = prefs.getString('taskLists');
+      if (tlStr != null) {
+        Iterable l = json.decode(tlStr);
+        _taskLists = List<TaskList>.from(l.map((model) => TaskList.fromJson(model)));
+      }
+
       final tkStr = prefs.getString('tasks');
       if (tkStr != null) {
         Iterable l = json.decode(tkStr);
@@ -45,9 +70,16 @@ class TaskProvider extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('tasks', json.encode(_tasks.map((t) => t.toJson()).toList()));
+      await prefs.setString('taskLists', json.encode(_taskLists.map((t) => t.toJson()).toList()));
     } catch (e) {
       debugPrint('Erro ao salvar tasks locais: $e');
     }
+  }
+
+  void addTaskList(TaskList list) {
+    _taskLists.add(list);
+    saveData();
+    notifyListeners();
   }
 
   void addTask(TaskItem task) {
