@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/finance_provider.dart';
+import 'core/task_provider.dart';
 import 'ui/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  final provider = FinanceProvider();
-  await provider.loadData();
+  final financeProvider = FinanceProvider();
+  await financeProvider.loadData();
+  
+  final taskProvider = TaskProvider();
+  await taskProvider.loadData();
   
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => provider),
+        ChangeNotifierProvider(create: (_) => financeProvider),
+        ChangeNotifierProvider(create: (_) => taskProvider),
       ],
       child: const CtrlFinanceApp(),
     ),
