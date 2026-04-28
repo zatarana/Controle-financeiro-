@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import '../core/finance_provider.dart';
 import '../core/finance_models.dart';
-import 'package:intl/intl.dart';
-import 'advanced_debts_tab.dart'; // Módulo de dívidas
-import 'tasks_overview_tab.dart'; // Módulo de tarefas
+import 'advanced_debts_tab.dart';
+import 'tasks_overview_tab.dart';
 import 'accounts_tab.dart';
 import 'categories_tab.dart';
 import 'credit_cards_tab.dart';
@@ -22,11 +21,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const DashboardTab(),
-    const AdvancedDebtsTab(),
-    const TasksOverviewTab(),
-    const ReportsTab(),
+  final List<Widget> _pages = const [
+    DashboardTab(),
+    AdvancedDebtsTab(),
+    TasksOverviewTab(),
+    ReportsTab(),
   ];
 
   @override
@@ -38,7 +37,10 @@ class _HomePageState extends State<HomePage> {
           children: [
             const DrawerHeader(
               decoration: BoxDecoration(color: Colors.black),
-              child: Text('Minhas Finanças\nMenu Principal', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+              child: Text(
+                'Minhas Finanças\nMenu Principal',
+                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.account_balance),
@@ -84,7 +86,7 @@ class _HomePageState extends State<HomePage> {
                 Text('Sync Local', style: TextStyle(fontSize: 10, color: Colors.black54, fontWeight: FontWeight.bold)),
               ],
             ),
-          )
+          ),
         ],
       ),
       body: SafeArea(child: _pages[_currentIndex]),
@@ -98,20 +100,22 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.bar_chart_outlined), activeIcon: Icon(Icons.bar_chart), label: 'Auditoria'),
         ],
       ),
-      floatingActionButton: (_currentIndex == 0 || _currentIndex == 3) ? FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () => _showAddDialog(context),
-      ) : null,
+      floatingActionButton: (_currentIndex == 0 || _currentIndex == 3)
+          ? FloatingActionButton(
+              child: const Icon(Icons.add),
+              onPressed: () => _showAddDialog(context),
+            )
+          : null,
     );
   }
 
   void _showAddDialog(BuildContext context) {
     showModalBottomSheet(
-      context: context, 
+      context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) {
-        return Container(
+        return Padding(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -152,7 +156,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         );
-      }
+      },
     );
   }
 
@@ -160,17 +164,19 @@ class _HomePageState extends State<HomePage> {
     final titleCtrl = TextEditingController();
     final amountCtrl = TextEditingController();
     bool isDebt = true;
-    
+
     showModalBottomSheet(
       isScrollControlled: true,
-      context: context, 
+      context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => StatefulBuilder(
         builder: (context, setState) => Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 24, right: 24, top: 24
+            left: 24,
+            right: 24,
+            top: 24,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -179,7 +185,7 @@ class _HomePageState extends State<HomePage> {
               const Text('Nova Dívida ou Empréstimo', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: -0.5)),
               const SizedBox(height: 24),
               TextField(
-                controller: titleCtrl, 
+                controller: titleCtrl,
                 decoration: InputDecoration(
                   labelText: 'Descrição',
                   labelStyle: const TextStyle(color: Colors.black54),
@@ -188,12 +194,12 @@ class _HomePageState extends State<HomePage> {
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
                   enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black)),
-                )
+                ),
               ),
               const SizedBox(height: 16),
               TextField(
-                controller: amountCtrl, 
-                keyboardType: const TextInputType.numberWithOptions(decimal: true), 
+                controller: amountCtrl,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
                   labelText: 'Valor (R\$)',
                   labelStyle: const TextStyle(color: Colors.black54),
@@ -202,7 +208,7 @@ class _HomePageState extends State<HomePage> {
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
                   enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE5E7EB))),
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black)),
-                )
+                ),
               ),
               const SizedBox(height: 24),
               Row(
@@ -215,7 +221,7 @@ class _HomePageState extends State<HomePage> {
                         decoration: BoxDecoration(
                           color: isDebt ? const Color(0xFFFEF2F2) : const Color(0xFFF9FAFB),
                           border: Border.all(color: isDebt ? Colors.red : Colors.transparent),
-                          borderRadius: BorderRadius.circular(12)
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         alignment: Alignment.center,
                         child: Text('Eu Devo (Dívida)', style: TextStyle(color: isDebt ? Colors.red : Colors.black54, fontWeight: FontWeight.bold)),
@@ -231,13 +237,13 @@ class _HomePageState extends State<HomePage> {
                         decoration: BoxDecoration(
                           color: !isDebt ? const Color(0xFFEFF6FF) : const Color(0xFFF9FAFB),
                           border: Border.all(color: !isDebt ? Colors.blue : Colors.transparent),
-                          borderRadius: BorderRadius.circular(12)
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         alignment: Alignment.center,
                         child: Text('Me Devem (Empr.)', style: TextStyle(color: !isDebt ? Colors.blue : Colors.black54, fontWeight: FontWeight.bold)),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: 32),
@@ -252,13 +258,15 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {
                   if (titleCtrl.text.isNotEmpty && amountCtrl.text.isNotEmpty) {
                     final provider = context.read<FinanceProvider>();
-                    provider.addDebtLoan(DebtLoan(
-                      id: DateTime.now().toString(),
-                      title: titleCtrl.text,
-                      amount: double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? 0,
-                      date: DateTime.now(),
-                      isDebt: isDebt
-                    ));
+                    provider.addDebtLoan(
+                      DebtLoan(
+                        id: DateTime.now().toString(),
+                        title: titleCtrl.text,
+                        amount: double.tryParse(amountCtrl.text.replaceAll(',', '.')) ?? 0,
+                        date: DateTime.now(),
+                        isDebt: isDebt,
+                      ),
+                    );
                     Navigator.pop(ctx);
                   }
                 },
@@ -268,7 +276,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-      )
+      ),
     );
   }
 }
@@ -280,7 +288,7 @@ class DashboardTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<FinanceProvider>();
     final currencyFormat = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20.0),
       child: Column(
@@ -291,9 +299,7 @@ class DashboardTab extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.black,
               borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 10))
-              ]
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 10))],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,7 +312,7 @@ class DashboardTab extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
                   child: const Text('Auditoria em tempo real', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                )
+                ),
               ],
             ),
           ),
@@ -327,48 +333,54 @@ class DashboardTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          provider.transactions.isEmpty 
-            ? Container(
-                padding: const EdgeInsets.all(32),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFF3F4F6))),
-                child: const Text('Nenhuma movimentação', style: TextStyle(color: Colors.black45, fontWeight: FontWeight.w500))
-              )
-            : ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: provider.transactions.length > 5 ? 5 : provider.transactions.length,
-                itemBuilder: (context, index) {
-                  final t = provider.transactions.reversed.toList()[index];
-                  bool isExpense = t.type == TransactionType.expense || t.type == TransactionType.creditCardExpense;
-                  bool isTransfer = t.type == TransactionType.transfer;
-                  
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      leading: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: isTransfer ? const Color(0xFFF3F4F6) : (isExpense ? const Color(0xFFFEF2F2) : const Color(0xFFF0FDF4)),
-                          borderRadius: BorderRadius.circular(12)
+          provider.transactions.isEmpty
+              ? Container(
+                  padding: const EdgeInsets.all(32),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFF3F4F6))),
+                  child: const Text('Nenhuma movimentação', style: TextStyle(color: Colors.black45, fontWeight: FontWeight.w500)),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: provider.transactions.length > 5 ? 5 : provider.transactions.length,
+                  itemBuilder: (context, index) {
+                    final t = provider.transactions.reversed.toList()[index];
+                    final isExpense = t.type == TransactionType.expense || t.type == TransactionType.creditCardExpense;
+                    final isTransfer = t.type == TransactionType.transfer;
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: isTransfer ? const Color(0xFFF3F4F6) : (isExpense ? const Color(0xFFFEF2F2) : const Color(0xFFF0FDF4)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            isTransfer ? Icons.swap_horiz : (isExpense ? Icons.shopping_bag_outlined : Icons.account_balance_wallet_outlined),
+                            color: isTransfer ? Colors.black54 : (isExpense ? Colors.red : Colors.green),
+                            size: 20,
+                          ),
                         ),
-                        child: Icon(isTransfer ? Icons.swap_horiz : (isExpense ? Icons.shopping_bag_outlined : Icons.account_balance_wallet_outlined), color: isTransfer ? Colors.black54 : (isExpense ? Colors.red : Colors.green), size: 20),
+                        title: Text(t.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                        subtitle: Text(
+                          '${DateFormat('dd MMM, yyyy').format(t.dueDate)}${!t.isPaid ? ' (Pendente)' : ''}',
+                          style: TextStyle(fontSize: 12, color: t.isPaid ? Colors.black54 : Colors.orange, fontWeight: t.isPaid ? FontWeight.normal : FontWeight.bold),
+                        ),
+                        trailing: Text(
+                          isTransfer ? currencyFormat.format(t.amount) : '${isExpense ? '-' : '+'} ${currencyFormat.format(t.amount)}',
+                          style: TextStyle(color: isTransfer ? Colors.black87 : (isExpense ? Colors.black87 : Colors.green), fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: -0.5),
+                        ),
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionFormPage(transaction: t, initialType: t.type)));
+                        },
                       ),
-                      title: Text(t.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-                      subtitle: Text('\${DateFormat('dd MMM, yyyy').format(t.dueDate)}\${!t.isPaid ? ' (Pendente)' : ''}', style: TextStyle(fontSize: 12, color: t.isPaid ? Colors.black54 : Colors.orange, fontWeight: t.isPaid ? FontWeight.normal : FontWeight.bold)),
-                      trailing: Text(
-                        isTransfer ? currencyFormat.format(t.amount) : '\${isExpense ? "-" : "+"} \${currencyFormat.format(t.amount)}',
-                        style: TextStyle(color: isTransfer ? Colors.black87 : (isExpense ? Colors.black87 : Colors.green), fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: -0.5),
-                      ),
-                      onTap: () {
-                        // Allow edit
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => TransactionFormPage(transaction: t, initialType: t.type)));
-                      },
-                    ),
-                  );
-                },
-            )
+                    );
+                  },
+                ),
         ],
       ),
     );
@@ -381,7 +393,12 @@ class DashboardTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border(left: BorderSide(color: accentColor, width: 4), top: const BorderSide(color: Color(0xFFF3F4F6)), right: const BorderSide(color: Color(0xFFF3F4F6)), bottom: const BorderSide(color: Color(0xFFF3F4F6)))
+        border: Border(
+          left: BorderSide(color: accentColor, width: 4),
+          top: const BorderSide(color: Color(0xFFF3F4F6)),
+          right: const BorderSide(color: Color(0xFFF3F4F6)),
+          bottom: const BorderSide(color: Color(0xFFF3F4F6)),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,58 +417,3 @@ class DashboardTab extends StatelessWidget {
     );
   }
 }
-
-class DebtsLoansTab extends StatelessWidget {
-  const DebtsLoansTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final provider = context.watch<FinanceProvider>();
-    final currencyFormat = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
-    
-    return provider.debtsLoans.isEmpty
-      ? const Center(child: Text('Tudo limpo! Nenhuma dívida ou empréstimo logado.', style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w500)))
-      : ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: provider.debtsLoans.length,
-        itemBuilder: (context, index) {
-          final dl = provider.debtsLoans[index];
-          return Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFF3F4F6))
-            ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              leading: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: dl.isPaid ? const Color(0xFFF3F4F6) : (dl.isDebt ? const Color(0xFFFEF2F2) : const Color(0xFFEFF6FF)),
-                  borderRadius: BorderRadius.circular(12)
-                ),
-                child: Icon(dl.isDebt ? Icons.money_off : Icons.monetization_on_outlined, color: dl.isPaid ? Colors.black26 : (dl.isDebt ? Colors.red : Colors.blue), size: 24),
-              ),
-              title: Text(dl.title, style: TextStyle(decoration: dl.isPaid ? TextDecoration.lineThrough : null, fontWeight: FontWeight.bold, fontSize: 15, color: dl.isPaid ? Colors.black38 : Colors.black87)),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 4.0),
-                child: Text(currencyFormat.format(dl.amount), style: TextStyle(color: dl.isPaid ? Colors.black26 : Colors.black54, fontWeight: FontWeight.w600)),
-              ),
-              trailing: Switch(
-                value: dl.isPaid,
-                activeColor: Colors.black,
-                inactiveTrackColor: const Color(0xFFE5E7EB),
-                inactiveThumbColor: Colors.white,
-                onChanged: (val) {
-                  context.read<FinanceProvider>().togglePaidStatus(dl.id);
-                },
-              ),
-            ),
-          );
-        },
-      );
-  }
-}
-
-
