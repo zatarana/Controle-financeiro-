@@ -25,7 +25,10 @@ jobs:
       - name: Recreate Android Project and Build
         run: |
           flutter create -t app --org com.ctrlfinance --project-name ctrl_finance_app new_flutter_app
-          sed -i -E 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "1.9.24"/g' new_flutter_app/android/settings.gradle || true
+          # Force update kotlin version in android settings and build
+          sed -i -e 's/version "1.[0-9]*\.[0-9]*"/version "1.9.24"/g' new_flutter_app/android/settings.gradle || true
+          sed -i -e "s/ext.kotlin_version = '<latest-version>'/ext.kotlin_version = '1.9.24'/g" new_flutter_app/android/build.gradle || true
+          sed -i -e "s/ext.kotlin_version = '1.*'/ext.kotlin_version = '1.9.24'/g" new_flutter_app/android/build.gradle || true
           cp -R flutter_app/lib/* new_flutter_app/lib/
           cp flutter_app/pubspec.yaml new_flutter_app/pubspec.yaml
           cd new_flutter_app

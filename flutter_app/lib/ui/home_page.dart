@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../core/finance_provider.dart';
 import 'package:intl/intl.dart';
+import 'advanced_debts_tab.dart'; // Módulo de dívidas
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,7 +17,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     const DashboardTab(),
-    const DebtsLoansTab(),
+    const AdvancedDebtsTab(),
     const ReportsTab(),
   ];
 
@@ -49,14 +50,14 @@ class _HomePageState extends State<HomePage> {
         onTap: (index) => setState(() => _currentIndex = index),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), activeIcon: Icon(Icons.dashboard), label: 'Visão Geral'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet_outlined), activeIcon: Icon(Icons.account_balance_wallet), label: 'Dívidas/Emp.'),
+          BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet_outlined), activeIcon: Icon(Icons.account_balance_wallet), label: 'Módulo Dívidas'),
           BottomNavigationBarItem(icon: Icon(Icons.bar_chart_outlined), activeIcon: Icon(Icons.bar_chart), label: 'Auditoria'),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: _currentIndex != 1 ? FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () => _showAddDialog(context),
-      ),
+      ) : null,
     );
   }
 

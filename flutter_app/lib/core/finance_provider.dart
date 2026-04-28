@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'debt_models.dart'; // import novo modulo de dividas
 
 // Modelos do Aplicativo
 class FinanceTransaction {
@@ -44,9 +45,11 @@ class DebtLoan {
 class FinanceProvider extends ChangeNotifier {
   List<FinanceTransaction> _transactions = [];
   List<DebtLoan> _debtsLoans = [];
+  List<DebtItem> _advancedDebts = []; // Novo módulo especifico
 
   List<FinanceTransaction> get transactions => _transactions;
   List<DebtLoan> get debtsLoans => _debtsLoans;
+  List<DebtItem> get advancedDebts => _advancedDebts;
 
   double get totalBalance {
     double exp = _transactions.where((t) => t.isExpense).fold(0, (sum, t) => sum + t.amount);
@@ -62,6 +65,7 @@ class FinanceProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final trStr = prefs.getString('transactions');
       final dlStr = prefs.getString('debtsLoans');
+      final adStr = prefs.getString('advancedDebts');
 
       if (trStr != null) {
         Iterable l = json.decode(trStr);
@@ -70,6 +74,10 @@ class FinanceProvider extends ChangeNotifier {
       if (dlStr != null) {
         Iterable l = json.decode(dlStr);
         _debtsLoans = List<DebtLoan>.from(l.map((model) => DebtLoan.fromJson(model)));
+      }
+      if (adStr != null) {
+        Iterable l = json.decode(adStr);
+        _advancedDebts = List<DebtItem>.from(l.map((model) => DebtItem.fromJson(model)));
       }
       notifyListeners();
     } catch (e) {
@@ -82,6 +90,7 @@ class FinanceProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('transactions', json.encode(_transactions.map((t) => t.toJson()).toList()));
       await prefs.setString('debtsLoans', json.encode(_debtsLoans.map((d) => d.toJson()).toList()));
+      await prefs.setString('advancedDebts', json.encode(_advancedDebts.map((d) => d.toJson()).toList()));
     } catch (e) {
       debugPrint('Erro ao salvar dados locais: \$e');
     }
@@ -97,6 +106,30 @@ class FinanceProvider extends ChangeNotifier {
     _debtsLoans.add(debtLoan);
     saveData();
     notifyListeners();
+  }
+
+  void addAdvancedDebt(DebtItem debt) {
+    _advancedDebts.add(debt);
+    saveData();
+    notifyListeners();
+  }
+
+  void updateAdvancedDebt(String id, DebtItem updatedDebt) {
+    final idx = _advancedDebts.indexWhere((element) => element.id == id);
+    if (idx != -1) {
+      _advancedDebts[idx] = updatedDebt;
+      saveData();
+      notifyListeners();
+    }
+  }
+
+  void startPaymentOfDebt(String debtId) {
+    final idx = _advancedDebts.indexWhere((element) => element.id == debtId);
+    if (idx != -1 && (_advancedDebts[idx].status == DebtStatus.pendente || _advancedDebts[idx].status == DebtStatus.renegociada)) {
+      _advancedDebts[idx].status = DebtStatus.emPagamento;
+      saveData();
+      notifyListeners();
+    }
   }
 
   void togglePaidStatus(String id) {
