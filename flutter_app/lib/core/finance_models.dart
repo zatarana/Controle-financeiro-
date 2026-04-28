@@ -37,8 +37,8 @@ class FinanceAccount {
   factory FinanceAccount.fromJson(Map<String, dynamic> json) => FinanceAccount(
     id: json['id'],
     name: json['name'],
-    initialBalance: json['initialBalance'] ?? 0.0,
-    currentBalance: json['currentBalance'] ?? 0.0,
+    initialBalance: (json['initialBalance'] ?? 0.0).toDouble(),
+    currentBalance: (json['currentBalance'] ?? 0.0).toDouble(),
     type: AccountType.values[json['type'] ?? 0],
     ignoreInTotals: json['ignoreInTotals'] ?? false,
     isDefault: json['isDefault'] ?? false,
@@ -130,10 +130,46 @@ class CreditCard {
   factory CreditCard.fromJson(Map<String, dynamic> json) => CreditCard(
     id: json['id'],
     name: json['name'],
-    limit: json['limit'] ?? 0.0,
+    limit: (json['limit'] ?? 0.0).toDouble(),
     closingDay: json['closingDay'] ?? 1,
     dueDay: json['dueDay'] ?? 5,
     defaultAccountId: json['defaultAccountId'] ?? '',
+  );
+}
+
+class DebtLoan {
+  final String id;
+  String title;
+  double amount;
+  DateTime date;
+  bool isDebt;
+  bool isPaid;
+
+  DebtLoan({
+    required this.id,
+    required this.title,
+    required this.amount,
+    required this.date,
+    required this.isDebt,
+    this.isPaid = false,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'amount': amount,
+    'date': date.toIso8601String(),
+    'isDebt': isDebt,
+    'isPaid': isPaid,
+  };
+
+  factory DebtLoan.fromJson(Map<String, dynamic> json) => DebtLoan(
+    id: json['id'],
+    title: json['title'],
+    amount: (json['amount'] ?? 0.0).toDouble(),
+    date: json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
+    isDebt: json['isDebt'] ?? true,
+    isPaid: json['isPaid'] ?? false,
   );
 }
 
@@ -158,7 +194,7 @@ class TransactionMultiCategory {
    factory TransactionMultiCategory.fromJson(Map<String, dynamic> json) => TransactionMultiCategory(
     categoryId: json['categoryId'],
     subcategoryId: json['subcategoryId'],
-    amount: json['amount'],
+    amount: (json['amount'] ?? 0.0).toDouble(),
     note: json['note'],
    );
 }
@@ -256,7 +292,7 @@ class AppFinanceTransaction {
   factory AppFinanceTransaction.fromJson(Map<String, dynamic> json) => AppFinanceTransaction(
     id: json['id'],
     title: json['title'],
-    amount: json['amount'] ?? 0.0,
+    amount: (json['amount'] ?? 0.0).toDouble(),
     releaseDate: json['releaseDate'] != null ? DateTime.parse(json['releaseDate']) : DateTime.parse(json['date']), // Fallback pra versões anter.
     dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : DateTime.parse(json['date']),
     effectiveDate: json['effectiveDate'] != null ? DateTime.parse(json['effectiveDate']) : null,
